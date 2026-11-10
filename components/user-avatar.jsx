@@ -18,3 +18,4 @@ const UserAvatar = ({ user }) => {
 };
 
 export default UserAvatar;
+   

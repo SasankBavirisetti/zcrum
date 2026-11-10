@@ -1,25 +1,14 @@
 // use prisma-8
 
-// model User {
-//   id        Int                @id @default(autoincrement())
-//   email     String             @unique
-//   username  String?
-//   name      String?
-//   posts     Post[]
-//   createdAt DateTime           @default(now()) @onCreate(now())
-//   updatedAt temporal.UpdatedAt
-// }
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")   
+  directUrl = env("DIRECT_URL")     
+}
 
-
-// model Post {
-//   id        Int                @id @default(autoincrement())
-//   title     String
-//   content   String?
-//   author    User               @relation(fields: [authorId], references: [id])
-//   authorId  Int
-//   createdAt DateTime           @default(now()) @onCreate(now())
-//   updatedAt temporal.UpdatedAt
-// }
+generator client {
+  provider = "prisma-client-js"
+}
 
 
 

@@ -46,7 +46,7 @@ export default function RootLayout({ children }) {
         >
           <ThemeProvider attribute="class" defaultTheme="dark">
             <Header />
-            <main className="min-h-screen">{children}</main>
+            <main className="min-h-screen pb-3">{children}</main>
             <footer className="bg-gray-900 py-12">
               <div className="container mx-auto text-center px-4 text-gray-200">
                 <p>Made with 💗 by RoadsideCoder</p>

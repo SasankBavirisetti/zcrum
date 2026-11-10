@@ -1,10 +1,10 @@
 "use server";
 
-import { db } from "@/lib/prisma";
+import { db } from "@/prisma/db";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 
 export async function createProject(data) {
-  const { userId, orgId } = auth();
+  const { userId, orgId } = await auth();
 
   if (!userId) {
     throw new Error("Unauthorized");
@@ -15,8 +15,9 @@ export async function createProject(data) {
   }
 
   // Check if the user is an admin of the organization
+  const clerk = await clerkClient();
   const { data: membershipList } =
-    await clerkClient().organizations.getOrganizationMembershipList({
+    await clerk.organizations.getOrganizationMembershipList({
       organizationId: orgId,
     });
 
@@ -29,13 +30,11 @@ export async function createProject(data) {
   }
 
   try {
-    const project = await db.project.create({
-      data: {
-        name: data.name,
-        key: data.key,
-        description: data.description,
-        organizationId: orgId,
-      },
+    const project = await db.orm.public.Project.create({
+      name: data.name,
+      key: data.key,
+      description: data.description,
+      organizationId: orgId,
     });
 
     return project;
@@ -45,30 +44,25 @@ export async function createProject(data) {
 }
 
 export async function getProject(projectId) {
-  const { userId, orgId } = auth();
+  const { userId, orgId } = await auth();
 
   if (!userId || !orgId) {
     throw new Error("Unauthorized");
   }
 
   // Find user to verify existence
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
+  const user = await db.orm.public.User.where({ clerkUserId: userId }).first();
 
   if (!user) {
     throw new Error("User not found");
   }
 
   // Get project with sprints and organization
-  const project = await db.project.findUnique({
-    where: { id: projectId },
-    include: {
-      sprints: {
-        orderBy: { createdAt: "desc" },
-      },
-    },
-  });
+  const project = await db.orm.public.Project.where({ id: projectId })
+    .include("sprints", (sprints) =>
+      sprints.orderBy((sprint) => sprint.createdAt.desc()),
+    )
+    .first();
 
   if (!project) {
     throw new Error("Project not found");
@@ -83,7 +77,7 @@ export async function getProject(projectId) {
 }
 
 export async function deleteProject(projectId) {
-  const { userId, orgId, orgRole } = auth();
+  const { userId, orgId, orgRole } = await auth();
 
   if (!userId || !orgId) {
     throw new Error("Unauthorized");
@@ -93,9 +87,7 @@ export async function deleteProject(projectId) {
     throw new Error("Only organization admins can delete projects");
   }
 
-  const project = await db.project.findUnique({
-    where: { id: projectId },
-  });
+  const project = await db.orm.public.Project.where({ id: projectId }).first();
 
   if (!project || project.organizationId !== orgId) {
     throw new Error(
@@ -103,9 +95,7 @@ export async function deleteProject(projectId) {
     );
   }
 
-  await db.project.delete({
-    where: { id: projectId },
-  });
+  await db.orm.public.Project.where({ id: projectId }).delete();
 
   return { success: true };
 }

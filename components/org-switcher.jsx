@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import {
   OrganizationSwitcher,
-  SignedIn,
+  Show,
   useOrganization,
   useUser,
 } from "@clerk/nextjs";
@@ -23,7 +23,7 @@ const OrgSwitcher = () => {
 
   return (
     <div className="flex justify-end mt-1">
-      <SignedIn>
+      <Show when="signed-in">
         <OrganizationSwitcher
           hidePersonal
           createOrganizationMode={
@@ -35,12 +35,12 @@ const OrgSwitcher = () => {
           appearance={{
             elements: {
               organizationSwitcherTrigger:
-                "border border-gray-300 rounded-md px-5 py-2",
+                "!border !border-gray-300 !rounded-md !px-5 !py-2",
               organizationSwitcherTriggerIcon: "text-white",
             },
           }}
         />
-      </SignedIn>
+      </Show>
     </div>
   );
 };
