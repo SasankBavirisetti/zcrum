@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma contract emit && (prisma skills sync || exit 0)",
+    "postinstall": "exit 0",
     "contract:emit": "prisma contract emit"
   },
   "dependencies": {
